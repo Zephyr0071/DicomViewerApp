@@ -701,7 +701,6 @@ namespace DicomViewerApp
         private void LoadSlice(int index, bool keepPlaying = false)
         {
             _currentIndex = index;
-            if (!_isMultiFrame && _currentMode != ViewerMode.Hdf5Polar && sliceSlider != null) sliceSlider.Value = index;
             RouteFile(_seriesFiles[index], keepPlaying);
         }
 
@@ -1273,7 +1272,7 @@ namespace DicomViewerApp
         private void TogglePlayback() { if (_totalFrames <= 1 && _seriesFiles.Count <= 1) return; _isPlaying = !_isPlaying; if (btnPlay != null) { btnPlay.Text = _isPlaying ? "⏸ Pause" : "▶ Play"; btnPlay.BackColor = _isPlaying ? SDColor.FromArgb(200, 60, 60) : SDColor.FromArgb(40, 44, 58); } if (_isPlaying) cineTimer.Start(); else cineTimer.Stop(); }
         private void StopPlayback() { if (_isPlaying) TogglePlayback(); }
         private void Navigate(int delta) { StopPlayback(); if (_currentMode == ViewerMode.Hdf5Polar || _isMultiFrame) { int next = _currentFrame + delta; if (next >= 0 && next < _totalFrames) { _currentFrame = next; if (sliceSlider != null) sliceSlider.Value = next; } } else { int next = _currentIndex + delta; if (next >= 0 && next < _seriesFiles.Count) LoadSlice(next); } }
-        private void LoadSlice(int index) { _currentIndex = index; if (!_isMultiFrame && _currentMode != ViewerMode.Hdf5Polar && sliceSlider != null) sliceSlider.Value = index; RouteFile(_seriesFiles[index]); }
+        private void LoadSlice(int index) { _currentIndex = index; RouteFile(_seriesFiles[index]); }
         private void UpdateFrameLabel() { if (lblSlice != null) lblSlice.Text = $"{_currentFrame + 1} / {_totalFrames}"; }
         private void SyncSlidersToMouse() { _isUpdatingSliders = true; if (tbContrast != null) tbContrast.Value = (int)Math.Max(1, Math.Min(_currentWW, 8000)); if (tbBrightness != null) tbBrightness.Value = (int)Math.Max(-2000, Math.Min(_currentWC, 6000)); if (lblContrast != null) lblContrast.Text = $"DICOM WW: {tbContrast?.Value}"; if (lblBrightness != null) lblBrightness.Text = $"DICOM WC: {tbBrightness?.Value}"; _isUpdatingSliders = false; }
         private async void LoadDicomFrame(int frameIndex) { if (!_isMultiFrame || _currentMode != ViewerMode.Dicom) return; _currentFrame = Math.Max(0, Math.Min(frameIndex, _totalFrames - 1)); UpdateFrameLabel(); if (sliceSlider != null && sliceSlider.Value != _currentFrame) sliceSlider.Value = _currentFrame; if (_isRenderingFrame) { _needsAnotherFrameRender = true; return; } _isRenderingFrame = true; _needsAnotherFrameRender = false; try { var img = await Task.Run(() => DicomEngine.RenderFrame(_currentFrame)); if (img != null) { var old = _loadedImage; _loadedImage = ApplyRotation(img); InvalidateViewers(); old?.Dispose(); } } catch { } finally { _isRenderingFrame = false; if (_needsAnotherFrameRender) LoadDicomFrame(_currentFrame); } }
