@@ -395,16 +395,19 @@ namespace DicomViewerApp
         {
             if (!keepPlaying) StopPlayback();
             DicomEngine.Reset();
-            _currentFrame = 0; _totalFrames = 1; _isMultiFrame = false; _currentMode = ViewerMode.None;
+
+            // Do NOT reset _currentFrame and _totalFrames here, it causes UI jumps
+            _isMultiFrame = false;
+            _currentMode = ViewerMode.None;
 
             SetSliderVisibility(ViewerMode.None);
             SetChannelButtonsVisibility(false);
 
-            if (pictureBox1 != null) pictureBox1.Image = null;
+            // ✨ FLICKER FIX: 
+            // Do NOT set pictureBox1.Image = null here. 
+            // We keep the old image visible so there is no black flash.
 
-            _loadedImage?.Dispose(); _loadedImage = null;
             ClearCaches();
-            GC.Collect(); GC.WaitForPendingFinalizers();
 
             _lutBuilt = false; _h5TissueRaw = null; _h5CineRaw = null;
             _h5VxRaw = null; _h5VyRaw = null; _h5VzRaw = null; _h5VelRaw = null;
@@ -413,7 +416,8 @@ namespace DicomViewerApp
             _showFlow = false;
             if (btnToggleFlow != null) btnToggleFlow.BackColor = SDColor.FromArgb(80, 80, 80);
 
-            UpdateSliderSafe(0, 0);
+            // Do not reset the slider to 0 here; wait for the next file to set its own Max.
+
             if (!keepPlaying)
             {
                 if (btnPrev != null) btnPrev.Enabled = false;
@@ -421,10 +425,10 @@ namespace DicomViewerApp
                 if (btnPlay != null) btnPlay.Enabled = false;
             }
 
-            InvalidateViewers();
             if (lblSlice != null) lblSlice.Text = "—";
-            SetStatus("Ready");
+            SetStatus("Loading...");
         }
+
 
         private void UpdateSliderSafe(int max, int val)
         {
