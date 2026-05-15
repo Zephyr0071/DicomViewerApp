@@ -1,1 +1,97 @@
-🩺 Medical Flow Analysis EngineHigh-Performance 4D Flow MRI & Hemodynamic VisualizerThis project is a specialized medical imaging workstation designed to extract, analyze, and visualize hemodynamic data from proprietary .itflow2 binary streams and HDF5-based medical datasets. It is optimized for engineering environments requiring high-speed processing of large-scale fluid dynamics data.🚀 Core Features5-Series Clinical Extraction: Automated extraction of clinical sequences from Protobuf-encoded streams, including:M (Magnitude): Anatomical background reference.C (Cine): High-resolution structural imaging (20MB+ per matrix).RL / AP / SI: Directional Phase-Contrast velocity mapping.P (Phase Speed): Real-time calculation of 3D speed magnitude.Advanced Rendering: Clinical grayscale normalization using the Nyquist Limit (VENC) for accurate flow representation.Mesh Quality Optimization: Integration of modules for mesh improvement and blood flow analysis using iTFlow software.Memory Management: Engineered to handle massive file sizes (500MB+) without stutters or crashes.🛠 Hardware & Architecture OptimizationDesigned for high-performance workstations like the ASUS Zephyrus M16, the engine includes several hardware-level optimizations:x64 Native Execution: Bypasses the 2GB memory limit of 32-bit applications to utilize full system resources (64GB RAM optimal).LOH (Large Object Heap) Support: Configured via App.config to allow single objects larger than 2GB, essential for high-res Cine matrices.God-Mode Caching: A dedicated MAX_CACHE_FRAMES system that stores pre-rendered frames in RAM for zero-latency playback of clinical loops.📐 Mathematical LogicThe engine calculates the speed magnitude ($P$) using the Euclidean norm of the orthogonal velocity vectors ($U, V, W$):$$\text{Speed} = \sqrt{U^2 + V^2 + W^2}$$Phase-Contrast rendering follows the Mid-Grey Rule:Zero Flow: RGB (128, 128, 128)Positive Velocity: Gradients toward White (255)Negative Velocity: Gradients toward Black (0)📂 Project Structure/Src: Core C# WinForms application and Protobuf extraction logic./Modules: Integration scripts for PyVista and Gmsh mesh quality tools./Config: Application configurations for high-memory allocation./Docs: Internship documentation and technical reports.🏗 InstallationOpen the solution in Visual Studio.Set the Build Configuration to x64.Ensure gcAllowVeryLargeObjects is enabled in App.config.Build and Run.
+# Medical 2D/3D Flow Viewer
+
+A high-performance .NET 8.0 desktop application designed for the visualization and analysis of complex medical imaging data, including standard DICOM series, HDF5-based Vector Flow Mapping (VFM), and massive 3D CFD (Computational Fluid Dynamics) surface meshes.
+
+## 🌟 Key Features
+
+### 1. Unified 2D Viewing
+
+* **DICOM Support:** Full support for `.dcm`, `.dicom`, and `.ima` files with real-time Window Center (WC) and Window Width (WW) adjustments.
+* **Vector Flow Mapping (VFM):** Advanced processing for HDF5 (`.h5`, `.vfm`) data in both Polar and Cartesian coordinates.
+* **iTFlow Integration:** Native support for proprietary `.itflow2` and `.itsp` project formats.
+* **Multi-Channel visualization:** Toggle between Tissue (Cine/M-Mode) and Velocity channels (Anteroposterior, Superior-Inferior, Right-Left, and Power).
+
+### 2. High-Performance 3D Surface Viewer
+
+* **Massive File Support:** Optimized to handle `.itsf` files exceeding 1GB.
+* **Surface Shell Extraction:** Utilizes a custom-built ParaView-style algorithm to strip internal tetrahedrons/cells, rendering only the "outer skin" to ensure 60+ FPS even with millions of points.
+* **Smooth Shading:** Automated normal computation for realistic 3D volume lighting and shadows.
+* **ParaView Controls:** Industry-standard 3D navigation gestures (Left-click orbit, Right-click pan).
+
+### 3. Analysis & Reporting
+
+* **PDF Reports:** Instant generation of medical reports including metadata and findings via QuestPDF.
+* **Frame Pinning:** Bookmark specific slices or frames for quick comparison and review.
+* **Snapshots:** High-resolution PNG exports of any 2D or 3D view.
+
+---
+
+## 🎮 Navigation & Controls
+
+### 2D View
+
+| Input | Action |
+| --- | --- |
+| **Left Click + Drag** | Pan / Move image |
+| **Right Click + Drag** | Adjust Window/Level (DICOM only) |
+| **Ctrl + Scroll** | Zoom In/Out |
+| **Scroll Wheel** | Navigate frames/slices |
+
+### 3D View (ParaView Style)
+
+| Input | Action |
+| --- | --- |
+| **Left Click + Drag** | **Rotate / Orbit** around the model |
+| **Right Click + Drag** | **Pan / Slide** the camera |
+| **Scroll Wheel** | **Zoom** toward/away from the focal point |
+| **ViewCube** | Quick orientation snapping |
+
+---
+
+## 📂 Supported File Formats
+
+* **DICOM:** `.dcm`, `.dicom`, `.ima`
+* **HDF5/VFM:** `.h5`, `.vfm`
+* **3D Surfaces:** `.itsf` (Native iTFlow), `.stl`, `.ply`
+* **iTFlow Projects:** `.itflow2`, `.itsp`
+* **Images:** `.png`, `.jpg`, `.bmp`
+
+---
+
+## 🛠️ Tech Stack
+
+* **Framework:** .NET 8.0 Windows
+* **UI:** Windows Forms + WPF (ElementHost)
+* **DICOM Engine:** [fo-dicom](https://github.com/fo-dicom/fo-dicom)
+* **3D Rendering:** [Helix Toolkit (WPF)](https://github.com/helix-toolkit/helix-toolkit)
+* **Data Handling:** PureHDF, protobuf-net, Newtonsoft.Json
+* **PDF Engine:** QuestPDF
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+* Visual Studio 2022
+* .NET 8.0 SDK
+* Windows 10/11 (x64)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/YourUsername/DicomViewerApp.git
+
+```
+
+
+2. Open `DicomViewerApp.sln` in Visual Studio.
+3. Restore NuGet packages.
+4. Build and Run in **Release / x64** mode for best 3D performance.
+
+---
+
+## 💡 Performance Optimization Note
+
+This application includes a **Smart Surface Extractor** for `.itsf` files. Standard 3D engines often choke on CFD data because it contains millions of internal points. Our parser identifies hidden internal faces and discards them before the data ever reaches the GPU, reducing the triangle count by up to 95% without losing any visual detail of the arterial wall or surface flow.
