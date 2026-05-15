@@ -4,7 +4,13 @@
     <_LastSelectedProfileId>C:\Users\intern\Desktop\testcs\DicomViewerApp\DicomViewerApp\DicomViewerApp\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Update="Form1.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="hdfviewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Viewer3DForm.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

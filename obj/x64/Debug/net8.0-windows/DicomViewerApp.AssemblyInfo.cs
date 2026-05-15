@@ -11,11 +11,10 @@
 using System;
 using System.Reflection;
 
-[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("3d9fa408-3aae-4dfa-ae24-207b6efa6316")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("DicomViewerApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f860dbb0b4826e444dd36e9614f7b9403812c09")]
 [assembly: System.Reflection.AssemblyProductAttribute("DicomViewerApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DicomViewerApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
